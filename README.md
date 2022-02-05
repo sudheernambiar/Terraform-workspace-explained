@@ -24,10 +24,9 @@ Resolving deltas: 100% (9/9), done.
 ```
 cd to that directory
 ```
-[root@ip-172-31-41-66 ~]# cd Terrafom-vpc-ec2-modulebased/
-[root@ip-172-31-41-66 Terrafom-vpc-ec2-modulebased]# ls
+#cd Terrafom-vpc-ec2-modulebased/
+# ls
 datasource.tf  output.tf  README.md  variables.tf  vpc.tf
-[root@ip-172-31-41-66 Terrafom-vpc-ec2-modulebased]# 
 ```
 ### Creation of .tfvars
 .tfvars or terraform varriables are used to overide the current values of variables. This will automatically replcaes the values in execution, however there wont be any change in the file.
@@ -55,16 +54,16 @@ variable "bits" {
     default = 3 
 ```
 Now we need to create three .tfvars file, for development, test and production with a new pattern of key value pairs(unlike usual variables in hcl language)
+make sure you are inside the git cloned directory "Terrafom-vpc-ec2-modulebased"
 ```
-[root@ip-172-31-41-66 Terrafom-vpc-ec2-modulebased]#
-touch prod.tfvars test.tfvars dev.tfvars
+#touch prod.tfvars test.tfvars dev.tfvars
 
-[root@ip-172-31-41-66 Terrafom-vpc-ec2-modulebased]# ls
+# ls
 datasource.tf  dev.tfvars  output.tf  prod.tfvars  README.md  test.tfvars  variables.tf  vpc.tf
 ```
 add following contents to 
 ```
-[root@ip-172-31-41-66 Terrafom-vpc-ec2-modulebased]# cat prod.tfvars 
+# cat prod.tfvars 
 cidr_block = "172.30.0.0/16"   #Subnet we provisioning for VPC
 project    = "MapMe"
 level      = "Prod"
@@ -84,14 +83,18 @@ owner      = "Sudheer"
 bits       = 3                 #in subnetting, bits took from host side for creation of subnets
 [root@ip-172-31-41-66 Terrafom-vpc-ec2-modulebased]# 
 ```
-###
 
 ## Execution steps.
+### Terraform initialisation.
 - terraform init (to initialise with the provider)
 ```
 $ terraform init 
 ```
+After the terraform init the entire file system will look like following, 
+```
 
+```
+### Testing of .tfvars, with terraform plan
 
 
 - To identify the procedure pre flight results
