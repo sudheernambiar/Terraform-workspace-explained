@@ -250,8 +250,9 @@ In such a scenario as I explained earlier, the solution is to make multiple plac
 Creating three workspaces for production/test/development.
 Note: any time you can use the -help option to identify all possible options in terraform.
 ```
-# terraform workspace                                        #tried tab option, you can install it with terraform -install-autocomplete
+# terraform workspace                            #tried tab option, you can install it with terraform -install-autocomplete
 delete  list    new     select  show
+
 # terraform workspace new production
 Created and switched to workspace "production"!
 
@@ -276,25 +277,141 @@ so if you run "terraform plan" Terraform will not see any existing state
 for this configuration.
 
 ```
+List all workspaces, 
+```
+# terraform workspace list
+  default
+* development
+  production
+  test
+  
 
+# terraform workspace select test
+Switched to workspace "test".
 
+# terraform workspace list
+  default
+  development
+  production
+* test
+```
+In test environment we can now execute the deployment with curresponding tfvars file.
+```
+# terraform workspace select test
+# terraform apply -var-file=test.tfvars
+```
+Likewise use prod.tfvars in production etc.
 
+Development Environment
+```
+# terraform workspace select development
+# terraform apply -var-file=dev.tfvars
+```
+Production Environment
+```
+# terraform workspace select production
+# terraform apply -var-file=prod.tfvars
+```
 
-- To identify the procedure pre flight results
+Good news is that, this wont overwrite the statefile, still can preserve it.
+
+The file structure is now as follows, 
 ```
-$ terraform plan 
+ tree -a -A
+.
+├── datasource.tf
+├── dev.tfvars
+├── .git
+│   ├── branches
+│   ├── config
+│   ├── description
+│   ├── HEAD
+│   ├── hooks
+│   │   ├── applypatch-msg.sample
+│   │   ├── commit-msg.sample
+│   │   ├── fsmonitor-watchman.sample
+│   │   ├── post-update.sample
+│   │   ├── pre-applypatch.sample
+│   │   ├── pre-commit.sample
+│   │   ├── pre-merge-commit.sample
+│   │   ├── prepare-commit-msg.sample
+│   │   ├── pre-push.sample
+│   │   ├── pre-rebase.sample
+│   │   ├── pre-receive.sample
+│   │   ├── push-to-checkout.sample
+│   │   └── update.sample
+│   ├── index
+│   ├── info
+│   │   └── exclude
+│   ├── logs
+│   │   ├── HEAD
+│   │   └── refs
+│   │       ├── heads
+│   │       │   └── main
+│   │       └── remotes
+│   │           └── origin
+│   │               └── HEAD
+│   ├── objects
+│   │   ├── info
+│   │   └── pack
+│   │       ├── pack-600dab5722460e326248a344318c1885dbdabcea.idx
+│   │       └── pack-600dab5722460e326248a344318c1885dbdabcea.pack
+│   ├── packed-refs
+│   └── refs
+│       ├── heads
+│       │   └── main
+│       ├── remotes
+│       │   └── origin
+│       │       └── HEAD
+│       └── tags
+├── output.tf
+├── prod.tfvars
+├── provider.tf
+├── README.md
+├── .terraform
+│   ├── environment
+│   └── providers
+│       └── registry.terraform.io
+│           └── hashicorp
+│               └── aws
+│                   └── 3.74.0
+│                       └── linux_amd64
+│                           └── terraform-provider-aws_v3.74.0_x5
+├── .terraform.lock.hcl
+├── terraform.tfstate.d
+│   ├── development
+│   ├── production
+│   └── test
+├── test.tfvars
+├── variables.tf
+└── vpc.tf
+
 ```
-- Execute the plan (with a yes you can permit after an overview, or explicitly work it with "terraform apply -auto-approve".
+You can see the workspaces just above the ending file
+├── terraform.tfstate.d
+│   ├── development
+│   ├── production
+│   └── test
 ```
-$ terraform apply 
-```
-- Incase to deploy without a pre flight check.
-```
-$ terraform apply -auto-approve 
-```
-Note: In case you want to make a clean-up use "terraform destroy"
+
+Note: In case you want to make a clean-up use "terraform destroy" in each workspace, after changing it, 
 ```
 $ terraform destroy
+
+$ terraform workspace select test
+$ terraform destroy -var-file=test.tfvars
+```
+Likewise use prod.tfvars in production etc.
+
+Development Environment
+```
+$ terraform workspace select development
+$ terraform destroy -var-file=dev.tfvars
+```
+Production Environment
+```
+$ terraform workspace select production
+$ terraform destroy -var-file=prod.tfvars
 ```
 ## Observations.
 
