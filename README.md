@@ -86,15 +86,198 @@ bits       = 3                 #in subnetting, bits took from host side for crea
 
 ## Execution steps.
 ### Terraform initialisation.
+- create a provider file with the region you want to specify in the file provider.tf
+```
+#vi provider.tf
+
+provider "aws" {
+   region = "ap-south-1"
+}
+
+```
 - terraform init (to initialise with the provider)
 ```
 $ terraform init 
 ```
 After the terraform init the entire file system will look like following, 
 ```
+tree -A -a
+.
+├── datasource.tf
+├── dev.tfvars
+├── .git
+│   ├── branches
+│   ├── config
+│   ├── description
+│   ├── HEAD
+│   ├── hooks
+│   │   ├── applypatch-msg.sample
+│   │   ├── commit-msg.sample
+│   │   ├── fsmonitor-watchman.sample
+│   │   ├── post-update.sample
+│   │   ├── pre-applypatch.sample
+│   │   ├── pre-commit.sample
+│   │   ├── pre-merge-commit.sample
+│   │   ├── prepare-commit-msg.sample
+│   │   ├── pre-push.sample
+│   │   ├── pre-rebase.sample
+│   │   ├── pre-receive.sample
+│   │   ├── push-to-checkout.sample
+│   │   └── update.sample
+│   ├── index
+│   ├── info
+│   │   └── exclude
+│   ├── logs
+│   │   ├── HEAD
+│   │   └── refs
+│   │       ├── heads
+│   │       │   └── main
+│   │       └── remotes
+│   │           └── origin
+│   │               └── HEAD
+│   ├── objects
+│   │   ├── info
+│   │   └── pack
+│   │       ├── pack-600dab5722460e326248a344318c1885dbdabcea.idx
+│   │       └── pack-600dab5722460e326248a344318c1885dbdabcea.pack
+│   ├── packed-refs
+│   └── refs
+│       ├── heads
+│       │   └── main
+│       ├── remotes
+│       │   └── origin
+│       │       └── HEAD
+│       └── tags
+├── output.tf
+├── prod.tfvars
+├── README.md
+├── .terraform
+│   └── providers
+│       └── registry.terraform.io
+│           └── hashicorp
+│               └── aws
+│                   └── 3.74.0
+│                       └── linux_amd64
+│                           └── terraform-provider-aws_v3.74.0_x5                  #Terraform provisioner
+├── .terraform.lock.hcl
+├── test.tfvars
+├── variables.tf
+└── vpc.tf
 
 ```
 ### Testing of .tfvars, with terraform plan
+trying test terraform variables, but see the result in + tags_all part in below, this will change as per the contents in the tf variable file.
+```
+# terraform plan -var-file=test.tfvars
+.
+.
+.
+.
+      + instance_tenancy                     = "default"
+      + ipv6_association_id                  = (known after apply)
+      + ipv6_cidr_block                      = (known after apply)
+      + ipv6_cidr_block_network_border_group = (known after apply)
+      + main_route_table_id                  = (known after apply)
+      + owner_id                             = (known after apply)
+      + tags                                 = {
+          + "Name"  = "MapMe-VPC-Test"
+          + "Owner" = "Sudheer"
+          + "env"   = "Test"
+        }
+      + tags_all                             = {
+          + "Name"  = "MapMe-VPC-Test"
+          + "Owner" = "Sudheer"
+          + "env"   = "Test"
+        }
+    }
+
+Plan: 18 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + private_subnet1 = (known after apply)
+  + private_subnet2 = (known after apply)
+  + private_subnet3 = (known after apply)
+  + public_subnet1  = (known after apply)
+  + public_subnet2  = (known after apply)
+  + public_subnet3  = (known after apply)
+  + vpc_id          = (known after apply)
+
+```
+Now if we try to work with production variables will change as per the file, 
+```
+#terraform plan -var-file=prod.tfvars                             #See the tags environment now changed.
+.
+.
+.
+.
+
+     + instance_tenancy                     = "default"
+      + ipv6_association_id                  = (known after apply)
+      + ipv6_cidr_block                      = (known after apply)
+      + ipv6_cidr_block_network_border_group = (known after apply)
+      + main_route_table_id                  = (known after apply)
+      + owner_id                             = (known after apply)
+      + tags                                 = {
+          + "Name"  = "MapMe-VPC-Prod"
+          + "Owner" = "Sudheer"
+          + "env"   = "Prod"
+        }
+      + tags_all                             = {
+          + "Name"  = "MapMe-VPC-Prod"
+          + "Owner" = "Sudheer"
+          + "env"   = "Prod"
+        }
+    }
+
+Plan: 18 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + private_subnet1 = (known after apply)
+  + private_subnet2 = (known after apply)
+  + private_subnet3 = (known after apply)
+  + public_subnet1  = (known after apply)
+  + public_subnet2  = (known after apply)
+  + public_subnet3  = (known after apply)
+  + vpc_id          = (known after apply)
+
+
+```
+### Risk factors
+If we have executed production/test/development in anyway consequently the statefile(file which contains all information about the terraform deployment will destroy, which is not a favourable things to see. This will also hurt our ability to roll back or restructure.
+
+### Terraform workspaces
+In such a scenario as I explained earlier, the solution is to make multiple places for each environment to run on. So that the statefile preserves.
+Creating three workspaces for production/test/development.
+Note: any time you can use the -help option to identify all possible options in terraform.
+```
+# terraform workspace                                        #tried tab option, you can install it with terraform -install-autocomplete
+delete  list    new     select  show
+# terraform workspace new production
+Created and switched to workspace "production"!
+
+You're now on a new, empty workspace. Workspaces isolate their state,
+so if you run "terraform plan" Terraform will not see any existing state
+for this configuration.
+
+
+# terraform workspace new test
+Created and switched to workspace "test"!
+
+You're now on a new, empty workspace. Workspaces isolate their state,
+so if you run "terraform plan" Terraform will not see any existing state
+for this configuration.
+
+
+# terraform workspace new development
+Created and switched to workspace "development"!
+
+You're now on a new, empty workspace. Workspaces isolate their state,
+so if you run "terraform plan" Terraform will not see any existing state
+for this configuration.
+
+```
+
+
 
 
 - To identify the procedure pre flight results
