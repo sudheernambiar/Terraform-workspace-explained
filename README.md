@@ -6,12 +6,12 @@
 - Terraform installed install git.
 - Installed with packages tree, git for verification and collection of data.
 - cloned all contents in this repo to a single location in EC2.
-- install the autocompletion with following commad. Logout and login. This will help us in autocompletion with tab.
+- install the autocompletion with following command. Logout and login. This will help us in autocompletion with tab.
 ```
 $terraform -install-autocomplete
 ```
 ## Files Explained
-### Get all files for a VPC creation is used here to execute this procedure. We are refering the VPC creation part to explain the different workspaces.
+### Get all files for a VPC creation is used here to execute this procedure. We are referring the VPC creation part to explain the different workspaces.
 ```
 $git clone https://github.com/sudheernambiar/Terrafom-vpc-ec2-modulebased.git
 Cloning into 'Terrafom-vpc-ec2-modulebased'...
@@ -29,11 +29,11 @@ cd to that directory
 datasource.tf  output.tf  README.md  variables.tf  vpc.tf
 ```
 ### Creation of .tfvars
-.tfvars or terraform varriables are used to overide the current values of variables. This will automatically replcaes the values in execution, however there wont be any change in the file.
+.tfvars or terraform variables are used to override the current values of variables. This will automatically replaces the values in execution, however there won’t be any change in the file.
 
 current variable file.
 ```
-[root@ip-172-31-41-66 Terrafom-vpc-ec2-modulebased]# cat variables.tf 
+$ cat variables.tf 
 variable "cidr_block" {
     default = "172.21.0.0/16"
 }
@@ -81,7 +81,6 @@ project    = "MapMe"
 level      = "Development"
 owner      = "Sudheer"
 bits       = 3                 #in subnetting, bits took from host side for creation of subnets
-[root@ip-172-31-41-66 Terrafom-vpc-ec2-modulebased]# 
 ```
 
 ## Execution steps.
@@ -295,7 +294,7 @@ Switched to workspace "test".
   production
 * test
 ```
-In test environment we can now execute the deployment with curresponding tfvars file.
+In test environment we can now execute the deployment with corresponding tfvars file.
 ```
 # terraform workspace select test
 # terraform apply -var-file=test.tfvars
@@ -313,7 +312,7 @@ Production Environment
 # terraform apply -var-file=prod.tfvars
 ```
 
-Good news is that, this wont overwrite the statefile, still can preserve it.
+Good news is that this won’t overwrite the statefile, still can preserve it.
 
 The file structure is now as follows, 
 ```
