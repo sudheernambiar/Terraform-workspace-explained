@@ -396,8 +396,6 @@ You can see the workspaces just above the ending file
 
 Note: In case you want to make a clean-up use "terraform destroy" in each workspace, after changing it, 
 ```
-$ terraform destroy
-
 $ terraform workspace select test
 $ terraform destroy -var-file=test.tfvars
 ```
