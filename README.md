@@ -388,6 +388,7 @@ The file structure is now as follows,
 
 ```
 You can see the workspaces just above the ending file
+```
 ├── terraform.tfstate.d
 │   ├── development
 │   ├── production
@@ -414,8 +415,8 @@ $ terraform workspace select production
 $ terraform destroy -var-file=prod.tfvars
 ```
 ## Observations.
-
+Name space is a good tool to provide a single environment for three different production deployment stages.
 ## Risk Factors
--
+- There should be a higly professional team required to use such a case, since a statefile recreation is a matter of real concern, if there is a human error occurs.
 ## Summary
-A handy option to use multiple environments to coordinate in a single directory.
+A handy option to use multiple environments to coordinate in a single directory, this is what terraform offers to provide.
